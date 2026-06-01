@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="version" content="1.0.0">
+  <meta name="version" content="1.1.0">
   <title>香蕉葉三聯組合圖產生器 | Banana Leaf Triptych Composer</title>
   <meta name="description" content="批次上傳大、中、小香蕉葉片影像，自動旋轉裁切並產出底部對齊的三聯組合圖。支援 ZIP 打包下載，完全在瀏覽器端處理。">
   <meta name="keywords" content="banana leaf, triptych, plant disease, leaf composition, 香蕉葉, 三聯圖, 葉片組合">
@@ -38,7 +38,7 @@
 
   <!-- PWA -->
   <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#4f46e5">
+  <meta name="theme-color" content="#2563eb">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <link rel="apple-touch-icon" href="assets/images/icon-192.png">
@@ -51,92 +51,126 @@
   <link rel="stylesheet" href="assets/css/style.css">
 
   <style>
-    /* Inline critical styles for first paint */
-    .drop-zone{transition:all .2s ease}
-    .drop-zone.drag-over{border-color:#6366f1;background-color:rgba(99,102,241,.08);transform:scale(1.01)}
-    .spinner{border:3px solid #e5e7eb;border-top:3px solid #6366f1;border-radius:50%;width:40px;height:40px;animation:spin .8s linear infinite}
-    @keyframes spin{to{transform:rotate(360deg)}}
-    .fade-in{animation:fadeIn .3s ease-in}
-    @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
-    .skip-link{position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden}
-    .skip-link:focus{position:fixed;top:0;left:0;width:auto;height:auto;padding:12px 24px;background:#4f46e5;color:#fff;z-index:9999;font-size:14px;outline:3px solid #818cf8;outline-offset:2px}
-    *:focus-visible{outline:3px solid #6366f1;outline-offset:2px;border-radius:4px}
-    @media(prefers-reduced-motion:reduce){.fade-in,.drop-zone,.spinner{animation:none!important;transition:none!important}}
+    .drop-zone { transition: all 0.2s ease; }
+    .drop-zone.drag-over { border-color: #3b82f6; background-color: rgba(59,130,246,0.08); }
+    .spinner { border: 3px solid #e5e7eb; border-top: 3px solid #3b82f6; border-radius: 50%; width: 40px; height: 40px; animation: spin 0.8s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .fade-in { animation: fadeIn 0.3s ease-in; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    .skip-link { position: absolute; left: -9999px; top: auto; width: 1px; height: 1px; overflow: hidden; }
+    .skip-link:focus { position: fixed; top: 0; left: 0; width: auto; height: auto; padding: 12px 24px; background: #2563eb; color: #fff; z-index: 9999; font-size: 14px; outline: 3px solid #60a5fa; outline-offset: 2px; }
+    *:focus-visible { outline: 3px solid #3b82f6; outline-offset: 2px; border-radius: 4px; }
+    @media (prefers-reduced-motion: reduce) { .fade-in, .drop-zone, .spinner { animation: none !important; transition: none !important; } }
+    /* Range slider styling */
+    input[type="range"] { -webkit-appearance: none; appearance: none; height: 6px; background: #dbeafe; border-radius: 3px; outline: none; }
+    input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 18px; height: 18px; border-radius: 50%; background: #3b82f6; cursor: pointer; border: 2px solid #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
+    input[type="range"]::-moz-range-thumb { width: 18px; height: 18px; border-radius: 50%; background: #3b82f6; cursor: pointer; border: 2px solid #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
   </style>
 </head>
-<body class="bg-gradient-to-br from-slate-50 to-indigo-50/30 min-h-screen flex flex-col text-slate-800">
+<body class="bg-gray-50 min-h-screen flex flex-col">
 
   <!-- Skip Link (a11y) -->
   <a href="#main-content" class="skip-link">跳至主要內容</a>
 
   <!-- Header -->
-  <header class="bg-white/80 backdrop-blur-sm shadow-sm border-b border-slate-200 sticky top-0 z-10">
-    <div class="max-w-6xl mx-auto px-4 sm:px-6 py-4 sm:py-5">
-      <h1 class="text-xl sm:text-2xl font-bold text-slate-800">🍌 香蕉葉三聯組合圖產生器</h1>
-      <p class="text-xs sm:text-sm text-slate-500 mt-1">批次上傳大、中、小葉片影像，自動旋轉裁切後產出底部對齊的三聯組合圖</p>
+  <header class="bg-white shadow-sm border-b border-gray-200">
+    <div class="max-w-6xl mx-auto px-6 py-5">
+      <h1 class="text-2xl font-bold text-gray-800">香蕉葉三聯組合圖產生器</h1>
+      <p class="text-sm text-gray-500 mt-1">批次上傳大、中、小葉片影像，自動旋轉裁切後產出底部對齊的三聯組合圖</p>
     </div>
   </header>
 
-  <main id="main-content" class="max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-8 flex-1 w-full">
-
-    <!-- Instructions -->
-    <div class="bg-indigo-50 border border-indigo-200 rounded-xl px-4 py-3 mb-6 sm:mb-8 text-sm text-indigo-800" role="note">
-      <strong>使用說明：</strong>分別在三個欄位上傳相同數量的影像（依檔名排序自動配對）。每張影像將先順時針旋轉 90°，再裁切上側 10%、左右各 5%，最後組合為三聯圖。
-    </div>
+  <main id="main-content" class="max-w-6xl mx-auto px-6 py-8 flex-1 w-full">
 
     <!-- Upload Section -->
-    <section aria-label="影像上傳區" class="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
+    <section aria-label="影像上傳區" class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
 
       <!-- Large Leaf -->
       <div>
-        <label id="labelLarge" class="block text-sm font-semibold text-slate-700 mb-2">批次上傳大葉片</label>
-        <div id="dropZoneLarge" class="drop-zone border-2 border-dashed border-slate-300 rounded-2xl p-6 text-center cursor-pointer hover:border-indigo-400 bg-white min-h-[160px] flex flex-col items-center justify-center shadow-sm" role="button" tabindex="0" aria-labelledby="labelLarge" aria-describedby="hintLarge">
+        <label id="labelLarge" class="block text-sm font-semibold text-gray-700 mb-2">批次上傳大葉片</label>
+        <div id="dropZoneLarge" class="drop-zone border-2 border-dashed border-gray-300 rounded-xl p-6 text-center cursor-pointer hover:border-blue-400 bg-white" role="button" tabindex="0" aria-labelledby="labelLarge">
           <input type="file" id="inputLarge" multiple accept="image/png,image/jpeg,image/webp,image/gif" class="hidden" aria-labelledby="labelLarge">
-          <svg class="h-10 w-10 text-slate-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 16v-8m0 0l-3 3m3-3l3 3M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2"/></svg>
-          <p class="text-sm text-slate-500" id="hintLarge">點擊或拖曳檔案至此</p>
-          <p id="countLarge" class="text-xs text-indigo-600 font-medium mt-2 hidden" aria-live="polite"></p>
+          <svg class="mx-auto h-10 w-10 text-gray-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 16v-8m0 0l-3 3m3-3l3 3M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2"/></svg>
+          <p class="text-sm text-gray-500">點擊或拖曳檔案至此</p>
+          <p id="countLarge" class="text-xs text-blue-600 font-medium mt-2 hidden" aria-live="polite"></p>
         </div>
       </div>
 
       <!-- Medium Leaf -->
       <div>
-        <label id="labelMedium" class="block text-sm font-semibold text-slate-700 mb-2">批次上傳中葉片</label>
-        <div id="dropZoneMedium" class="drop-zone border-2 border-dashed border-slate-300 rounded-2xl p-6 text-center cursor-pointer hover:border-indigo-400 bg-white min-h-[160px] flex flex-col items-center justify-center shadow-sm" role="button" tabindex="0" aria-labelledby="labelMedium" aria-describedby="hintMedium">
+        <label id="labelMedium" class="block text-sm font-semibold text-gray-700 mb-2">批次上傳中葉片</label>
+        <div id="dropZoneMedium" class="drop-zone border-2 border-dashed border-gray-300 rounded-xl p-6 text-center cursor-pointer hover:border-blue-400 bg-white" role="button" tabindex="0" aria-labelledby="labelMedium">
           <input type="file" id="inputMedium" multiple accept="image/png,image/jpeg,image/webp,image/gif" class="hidden" aria-labelledby="labelMedium">
-          <svg class="h-10 w-10 text-slate-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 16v-8m0 0l-3 3m3-3l3 3M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2"/></svg>
-          <p class="text-sm text-slate-500" id="hintMedium">點擊或拖曳檔案至此</p>
-          <p id="countMedium" class="text-xs text-indigo-600 font-medium mt-2 hidden" aria-live="polite"></p>
+          <svg class="mx-auto h-10 w-10 text-gray-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 16v-8m0 0l-3 3m3-3l3 3M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2"/></svg>
+          <p class="text-sm text-gray-500">點擊或拖曳檔案至此</p>
+          <p id="countMedium" class="text-xs text-blue-600 font-medium mt-2 hidden" aria-live="polite"></p>
         </div>
       </div>
 
       <!-- Small Leaf -->
       <div>
-        <label id="labelSmall" class="block text-sm font-semibold text-slate-700 mb-2">批次上傳小葉片</label>
-        <div id="dropZoneSmall" class="drop-zone border-2 border-dashed border-slate-300 rounded-2xl p-6 text-center cursor-pointer hover:border-indigo-400 bg-white min-h-[160px] flex flex-col items-center justify-center shadow-sm" role="button" tabindex="0" aria-labelledby="labelSmall" aria-describedby="hintSmall">
+        <label id="labelSmall" class="block text-sm font-semibold text-gray-700 mb-2">批次上傳小葉片</label>
+        <div id="dropZoneSmall" class="drop-zone border-2 border-dashed border-gray-300 rounded-xl p-6 text-center cursor-pointer hover:border-blue-400 bg-white" role="button" tabindex="0" aria-labelledby="labelSmall">
           <input type="file" id="inputSmall" multiple accept="image/png,image/jpeg,image/webp,image/gif" class="hidden" aria-labelledby="labelSmall">
-          <svg class="h-10 w-10 text-slate-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 16v-8m0 0l-3 3m3-3l3 3M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2"/></svg>
-          <p class="text-sm text-slate-500" id="hintSmall">點擊或拖曳檔案至此</p>
-          <p id="countSmall" class="text-xs text-indigo-600 font-medium mt-2 hidden" aria-live="polite"></p>
+          <svg class="mx-auto h-10 w-10 text-gray-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 16v-8m0 0l-3 3m3-3l3 3M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2"/></svg>
+          <p class="text-sm text-gray-500">點擊或拖曳檔案至此</p>
+          <p id="countSmall" class="text-xs text-blue-600 font-medium mt-2 hidden" aria-live="polite"></p>
         </div>
       </div>
     </section>
 
+    <!-- Crop Settings -->
+    <section class="bg-white border border-gray-200 rounded-xl p-5 mb-8 shadow-sm" aria-label="裁切設定">
+      <h2 class="text-sm font-semibold text-gray-700 mb-4">裁切設定（旋轉 90° 後套用）</h2>
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+
+        <!-- Crop Top -->
+        <div>
+          <div class="flex items-center justify-between mb-2">
+            <label for="cropTop" class="text-sm text-gray-600">上側裁切</label>
+            <span id="cropTopValue" class="text-sm font-semibold text-blue-600" aria-live="polite">10%</span>
+          </div>
+          <input type="range" id="cropTop" min="0" max="50" value="10" step="1" class="w-full" aria-label="上側裁切百分比">
+        </div>
+
+        <!-- Crop Left -->
+        <div>
+          <div class="flex items-center justify-between mb-2">
+            <label for="cropLeft" class="text-sm text-gray-600">左側裁切</label>
+            <span id="cropLeftValue" class="text-sm font-semibold text-blue-600" aria-live="polite">5%</span>
+          </div>
+          <input type="range" id="cropLeft" min="0" max="50" value="5" step="1" class="w-full" aria-label="左側裁切百分比">
+        </div>
+
+        <!-- Crop Right -->
+        <div>
+          <div class="flex items-center justify-between mb-2">
+            <label for="cropRight" class="text-sm text-gray-600">右側裁切</label>
+            <span id="cropRightValue" class="text-sm font-semibold text-blue-600" aria-live="polite">5%</span>
+          </div>
+          <input type="range" id="cropRight" min="0" max="50" value="5" step="1" class="w-full" aria-label="右側裁切百分比">
+        </div>
+
+      </div>
+      <p class="text-xs text-gray-400 mt-3">設為 0% 表示該側不裁切。左右合計不可超過 90%。</p>
+    </section>
+
     <!-- Action Buttons -->
-    <section class="flex flex-wrap items-center gap-3 sm:gap-4 mb-6 sm:mb-8">
-      <button id="btnGenerate" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-5 sm:px-6 py-2.5 rounded-xl shadow-md hover:shadow-lg transition-all" aria-label="產出組合圖">
+    <section class="flex flex-wrap items-center gap-4 mb-8">
+      <button id="btnGenerate" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2.5 rounded-lg shadow transition" aria-label="產出組合圖">
         產出組合圖
       </button>
-      <button id="btnDownload" class="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-5 sm:px-6 py-2.5 rounded-xl shadow-md hover:shadow-lg transition-all hidden" aria-label="打包下載為 ZIP 檔">
+      <button id="btnDownload" class="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-6 py-2.5 rounded-lg shadow transition hidden" aria-label="打包下載為 ZIP 檔">
         打包下載（ZIP）
       </button>
-      <button id="btnClear" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold px-5 sm:px-6 py-2.5 rounded-xl transition-all hidden" aria-label="清除所有上傳與結果">
+      <button id="btnClear" class="bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold px-6 py-2.5 rounded-lg transition hidden" aria-label="清除所有上傳與結果">
         清除全部
       </button>
-      <span id="statusText" class="text-sm text-slate-400 ml-auto hidden" aria-live="polite"></span>
+      <span id="statusText" class="text-sm text-gray-400 ml-auto hidden" aria-live="polite"></span>
     </section>
 
     <!-- Error Banner -->
-    <div id="errorBanner" class="hidden bg-red-50 border border-red-200 rounded-xl px-4 py-3 mb-6 text-sm text-red-700 items-center gap-2" role="alert" aria-live="assertive">
+    <div id="errorBanner" class="hidden bg-red-50 border border-red-200 rounded-lg px-4 py-3 mb-6 text-sm text-red-700 items-center gap-2" role="alert" aria-live="assertive">
       <svg class="h-5 w-5 flex-shrink-0 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
       <span id="errorText"></span>
     </div>
@@ -144,18 +178,17 @@
     <!-- Loading Spinner -->
     <div id="loadingOverlay" class="hidden flex flex-col items-center gap-3 py-12" role="status" aria-live="polite">
       <div class="spinner" aria-hidden="true"></div>
-      <p id="loadingText" class="text-sm text-slate-500">正在產出組合圖，請稍候…</p>
+      <p id="loadingText" class="text-sm text-gray-500">正在產出組合圖，請稍候…</p>
     </div>
 
     <!-- Result Gallery -->
-    <section id="gallery" class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mb-12" aria-label="組合圖結果"></section>
+    <section id="gallery" class="grid grid-cols-1 lg:grid-cols-2 gap-6" aria-label="組合圖結果"></section>
 
   </main>
 
   <!-- Footer -->
-  <footer class="border-t border-slate-200 bg-white/60 py-4 text-center text-xs text-slate-400 px-4">
-    <p>香蕉葉三聯組合圖產生器 v1.0.0</p>
-    <p class="mt-1">所有影像處理皆在您的瀏覽器中完成，不會上傳至任何伺服器。</p>
+  <footer class="border-t border-gray-200 bg-white py-4 text-center text-xs text-gray-400">
+    <p>香蕉葉三聯組合圖產生器 v1.1.0 — 所有影像處理皆在您的瀏覽器中完成，不會上傳至任何伺服器。</p>
   </footer>
 
   <!-- JSZip -->
@@ -172,7 +205,7 @@
       bgColor: "#000000",
       outputFormat: "image/png",
       filePrefix: "triptych_",
-      maxFileSize: 50 * 1024 * 1024, // 50 MB per file
+      maxFileSize: 50 * 1024 * 1024,
       allowedMimes: ["image/png", "image/jpeg", "image/webp", "image/gif"],
     };
 
@@ -180,41 +213,17 @@
     var SecurityUtils = {
       sanitizeText: function (input) {
         if (typeof input !== "string") return "";
-        return input
-          .replace(/&/g, "&amp;")
-          .replace(/</g, "&lt;")
-          .replace(/>/g, "&gt;")
-          .replace(/"/g, "&quot;")
-          .replace(/'/g, "&#x27;");
-      },
-      sanitizeFilename: function (name, fallback) {
-        fallback = fallback || "download";
-        if (typeof name !== "string") return fallback;
-        var safe = name
-          .replace(/[\/\\:*?"<>|\x00-\x1f]/g, "_")
-          .replace(/\.(?=.*\.)/g, "_")
-          .trim();
-        if (!safe || safe === "_") return fallback;
-        return safe.substring(0, 100);
+        return input.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#x27;");
       },
       validateFile: function (file) {
-        if (!CONFIG.allowedMimes.includes(file.type)) {
-          return "不支援的檔案格式：" + SecurityUtils.sanitizeText(file.type);
-        }
-        if (file.size > CONFIG.maxFileSize) {
-          return "檔案過大（上限 50 MB）：" + SecurityUtils.sanitizeText(file.name);
-        }
+        if (!CONFIG.allowedMimes.includes(file.type)) return "不支援的檔案格式：" + SecurityUtils.sanitizeText(file.type);
+        if (file.size > CONFIG.maxFileSize) return "檔案過大（上限 50 MB）：" + SecurityUtils.sanitizeText(file.name);
         return null;
       },
     };
 
     // ── State ──
-    var state = {
-      largeFiles: [],
-      mediumFiles: [],
-      smallFiles: [],
-      canvasBlobs: [],
-    };
+    var state = { largeFiles: [], mediumFiles: [], smallFiles: [], canvasBlobs: [] };
 
     // ── DOM References ──
     var dom = {
@@ -227,6 +236,12 @@
       countLarge: document.getElementById("countLarge"),
       countMedium: document.getElementById("countMedium"),
       countSmall: document.getElementById("countSmall"),
+      cropTop: document.getElementById("cropTop"),
+      cropLeft: document.getElementById("cropLeft"),
+      cropRight: document.getElementById("cropRight"),
+      cropTopValue: document.getElementById("cropTopValue"),
+      cropLeftValue: document.getElementById("cropLeftValue"),
+      cropRightValue: document.getElementById("cropRightValue"),
       btnGenerate: document.getElementById("btnGenerate"),
       btnDownload: document.getElementById("btnDownload"),
       btnClear: document.getElementById("btnClear"),
@@ -237,6 +252,16 @@
       loadingOverlay: document.getElementById("loadingOverlay"),
       loadingText: document.getElementById("loadingText"),
     };
+
+    // ── Crop Slider Live Update ──
+    function wireCropSlider(slider, display) {
+      slider.addEventListener("input", function () {
+        display.textContent = slider.value + "%";
+      });
+    }
+    wireCropSlider(dom.cropTop, dom.cropTopValue);
+    wireCropSlider(dom.cropLeft, dom.cropLeftValue);
+    wireCropSlider(dom.cropRight, dom.cropRightValue);
 
     // ── Helpers ──
 
@@ -256,38 +281,20 @@
     }
 
     function updateCount(counterEl, count) {
-      if (count > 0) {
-        counterEl.textContent = "已選取 " + count + " 個檔案";
-        counterEl.classList.remove("hidden");
-      } else {
-        counterEl.classList.add("hidden");
-      }
+      if (count > 0) { counterEl.textContent = "已選取 " + count + " 個檔案"; counterEl.classList.remove("hidden"); }
+      else { counterEl.classList.add("hidden"); }
     }
 
-    function padIndex(n, width) {
-      width = width || 3;
-      return String(n).padStart(width, "0");
-    }
+    function padIndex(n, width) { return String(n).padStart(width || 3, "0"); }
 
-    function showError(msg) {
-      dom.errorText.textContent = msg;
-      dom.errorBanner.classList.remove("hidden");
-      dom.errorBanner.classList.add("flex");
-    }
-
-    function hideError() {
-      dom.errorBanner.classList.add("hidden");
-      dom.errorBanner.classList.remove("flex");
-    }
+    function showError(msg) { dom.errorText.textContent = msg; dom.errorBanner.classList.remove("hidden"); dom.errorBanner.classList.add("flex"); }
+    function hideError() { dom.errorBanner.classList.add("hidden"); dom.errorBanner.classList.remove("flex"); }
 
     // ── Drop Zone Wiring ──
 
     function wireDropZone(dropZone, fileInput, stateKey, counterEl) {
       function handleFiles(fileList) {
-        var filtered = Array.from(fileList).filter(function (f) {
-          return f.type.startsWith("image/");
-        });
-        // Validate each file
+        var filtered = Array.from(fileList).filter(function (f) { return f.type.startsWith("image/"); });
         for (var i = 0; i < filtered.length; i++) {
           var err = SecurityUtils.validateFile(filtered[i]);
           if (err) { showError(err); return; }
@@ -302,20 +309,11 @@
       dropZone.addEventListener("keydown", function (e) {
         if (e.key === "Enter" || e.key === " ") { e.preventDefault(); fileInput.click(); }
       });
-
       fileInput.addEventListener("change", function () { handleFiles(fileInput.files); });
-
-      dropZone.addEventListener("dragover", function (e) {
-        e.preventDefault();
-        dropZone.classList.add("drag-over");
-      });
-      dropZone.addEventListener("dragleave", function () {
-        dropZone.classList.remove("drag-over");
-      });
+      dropZone.addEventListener("dragover", function (e) { e.preventDefault(); dropZone.classList.add("drag-over"); });
+      dropZone.addEventListener("dragleave", function () { dropZone.classList.remove("drag-over"); });
       dropZone.addEventListener("drop", function (e) {
-        e.preventDefault();
-        dropZone.classList.remove("drag-over");
-        handleFiles(e.dataTransfer.files);
+        e.preventDefault(); dropZone.classList.remove("drag-over"); handleFiles(e.dataTransfer.files);
       });
     }
 
@@ -323,9 +321,9 @@
     wireDropZone(dom.dropZoneMedium, dom.inputMedium, "mediumFiles", dom.countMedium);
     wireDropZone(dom.dropZoneSmall, dom.inputSmall, "smallFiles", dom.countSmall);
 
-    // ── Preprocessing: Rotate 90° CW + Crop ──
+    // ── Preprocessing: Rotate 90° CW + User-defined Crop ──
 
-    function preprocessImage(img) {
+    function preprocessImage(img, cropTopPct, cropLeftPct, cropRightPct) {
       var origW = img.naturalWidth;
       var origH = img.naturalHeight;
 
@@ -338,14 +336,23 @@
       rotCtx.rotate(Math.PI / 2);
       rotCtx.drawImage(img, 0, 0);
 
-      // Step 2: Crop rotated result — top 10%, left 5%, right 5%
+      // Step 2: Crop based on user-defined percentages
       var rotW = rotCanvas.width;
       var rotH = rotCanvas.height;
-      var cropTop = Math.round(rotH * 0.10);
-      var cropLeft = Math.round(rotW * 0.05);
-      var cropRight = Math.round(rotW * 0.05);
+      var cropTop = Math.round(rotH * cropTopPct / 100);
+      var cropLeft = Math.round(rotW * cropLeftPct / 100);
+      var cropRight = Math.round(rotW * cropRightPct / 100);
       var croppedW = rotW - cropLeft - cropRight;
       var croppedH = rotH - cropTop;
+
+      if (croppedW <= 0 || croppedH <= 0) {
+        // Safety: if crop is too aggressive, return original rotated image
+        return new Promise(function (resolve) {
+          var p = new Image();
+          p.onload = function () { resolve(p); };
+          p.src = rotCanvas.toDataURL();
+        });
+      }
 
       var cropCanvas = document.createElement("canvas");
       cropCanvas.width = croppedW;
@@ -423,6 +430,21 @@
         return;
       }
 
+      // Read crop values from sliders
+      var cropTopPct = parseInt(dom.cropTop.value, 10);
+      var cropLeftPct = parseInt(dom.cropLeft.value, 10);
+      var cropRightPct = parseInt(dom.cropRight.value, 10);
+
+      // Validate crop sum
+      if (cropLeftPct + cropRightPct >= 90) {
+        showError("左右裁切合計不可超過 90%。目前：左 " + cropLeftPct + "% + 右 " + cropRightPct + "% = " + (cropLeftPct + cropRightPct) + "%");
+        return;
+      }
+      if (cropTopPct >= 90) {
+        showError("上側裁切不可超過 90%。");
+        return;
+      }
+
       var totalSets = largeFiles.length;
 
       dom.loadingOverlay.classList.remove("hidden");
@@ -444,25 +466,24 @@
           var rawM = await loadImage(mediumFiles[i]);
           var rawS = await loadImage(smallFiles[i]);
 
-          var imgL = await preprocessImage(rawL);
-          var imgM = await preprocessImage(rawM);
-          var imgS = await preprocessImage(rawS);
+          var imgL = await preprocessImage(rawL, cropTopPct, cropLeftPct, cropRightPct);
+          var imgM = await preprocessImage(rawM, cropTopPct, cropLeftPct, cropRightPct);
+          var imgS = await preprocessImage(rawS, cropTopPct, cropLeftPct, cropRightPct);
 
           var canvas = composeTriptych(imgL, imgM, imgS);
           var blob = await canvasToBlob(canvas);
           state.canvasBlobs.push(blob);
 
-          // Gallery card — safe DOM creation (no innerHTML with user data)
           var wrapper = document.createElement("div");
-          wrapper.className = "bg-white rounded-2xl shadow-sm p-3 border border-slate-200 fade-in";
+          wrapper.className = "bg-white rounded-xl shadow p-3 border border-gray-200 fade-in";
 
           var label = document.createElement("p");
-          label.className = "text-xs text-slate-500 mb-2 font-medium";
+          label.className = "text-xs text-gray-500 mb-2 font-medium";
           label.textContent = "組合 " + padIndex(i + 1);
 
           var img = document.createElement("img");
           img.src = URL.createObjectURL(blob);
-          img.className = "w-full rounded-xl";
+          img.className = "w-full rounded-lg";
           img.alt = "三聯組合圖 " + padIndex(i + 1);
           img.loading = "lazy";
 
@@ -494,7 +515,6 @@
 
     dom.btnDownload.addEventListener("click", async function () {
       if (state.canvasBlobs.length === 0) return;
-
       dom.btnDownload.disabled = true;
       dom.btnDownload.textContent = "正在打包中…";
 
@@ -503,7 +523,6 @@
         state.canvasBlobs.forEach(function (blob, i) {
           zip.file(CONFIG.filePrefix + padIndex(i + 1) + ".png", blob);
         });
-
         var content = await zip.generateAsync({ type: "blob" });
         var url = URL.createObjectURL(content);
         var a = document.createElement("a");
@@ -528,15 +547,12 @@
       state.mediumFiles = [];
       state.smallFiles = [];
       state.canvasBlobs = [];
-
       dom.inputLarge.value = "";
       dom.inputMedium.value = "";
       dom.inputSmall.value = "";
-
       dom.countLarge.classList.add("hidden");
       dom.countMedium.classList.add("hidden");
       dom.countSmall.classList.add("hidden");
-
       dom.gallery.innerHTML = "";
       dom.btnDownload.classList.add("hidden");
       dom.btnClear.classList.add("hidden");
@@ -545,7 +561,6 @@
     });
 
     // ── PWA: Service Worker Registration ──
-
     if ("serviceWorker" in navigator) {
       window.addEventListener("load", function () {
         navigator.serviceWorker.register("sw.js").catch(function () {});
