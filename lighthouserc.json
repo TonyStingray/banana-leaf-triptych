@@ -1,0 +1,14 @@
+{
+  "ci": {
+    "collect": {
+      "staticDistDir": "dist"
+    },
+    "assert": {
+      "preset": "lighthouse:recommended",
+      "assertions": {
+        "uses-responsive-images": "off",
+        "unsized-images": "off"
+      }
+    }
+  }
+}

@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>版本紀錄 — 香蕉葉三聯組合圖產生器</title>
+  <style>
+    body{font-family:system-ui,sans-serif;max-width:640px;margin:2rem auto;padding:0 1rem;color:#334155;line-height:1.7}
+    h1{color:#6366f1;font-size:1.5rem}
+    h2{font-size:1.15rem;margin-top:2rem;border-bottom:1px solid #e2e8f0;padding-bottom:.3rem}
+    ul{padding-left:1.2rem}
+    a{color:#6366f1}
+    .date{font-size:.85rem;color:#94a3b8}
+  </style>
+</head>
+<body>
+  <h1>版本紀錄</h1>
+  <p><a href="./">← 返回工具</a></p>
+
+  <h2>v1.0.0 <span class="date">2026-05-29</span></h2>
+  <ul>
+    <li>首次發布</li>
+    <li>三欄位批次上傳（大、中、小葉片），依索引自動配對</li>
+    <li>前處理：順時針旋轉 90°、裁切上側 10%、左右各 5%</li>
+    <li>Canvas 組合：固定高度 1200px、左右黑邊 50px、底部對齊</li>
+    <li>ZIP 打包下載（JSZip）</li>
+    <li>PWA 離線支援、WCAG 2.1 AA 無障礙、CSP 安全標頭</li>
+  </ul>
+</body>
+</html>

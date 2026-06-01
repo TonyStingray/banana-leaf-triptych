@@ -1,0 +1,24 @@
+{
+  "name": "香蕉葉三聯組合圖產生器",
+  "short_name": "葉片組合器",
+  "description": "批次上傳大、中、小香蕉葉片影像，自動旋轉裁切並產出底部對齊的三聯組合圖。",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#f8fafc",
+  "theme_color": "#4f46e5",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "assets/images/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "assets/images/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
