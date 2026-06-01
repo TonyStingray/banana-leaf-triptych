@@ -1,6 +1,6 @@
 "use strict";
 
-var CACHE_NAME = "banana-leaf-triptych-v1.0.0";
+var CACHE_NAME = "banana-leaf-triptych-v1.1.0";
 var ASSETS_TO_CACHE = [
   "./",
   "./index.html",
